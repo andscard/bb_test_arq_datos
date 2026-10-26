@@ -1,0 +1,47 @@
+# Databricks Asset Bundle: despliegue del pipeline como código (CI/CD por ambiente)
+# Uso: databricks bundle deploy -t dev | prod
+bundle:
+  name: adquirencia-lakehouse
+
+variables:
+  eventhubs_namespace:
+    description: Namespace de Azure Event Hubs que recibe el CDC
+  warehouse_id:
+    description: SQL Warehouse serverless de consumo (escala de 1 a N clústeres por concurrencia)
+    lookup:
+      warehouse: adq-consumo-serverless
+
+resources:
+  pipelines:
+    adq_medallion:
+      name: adq-medallion-cdc
+      catalog: adquirencia
+      schema: silver                # esquema por defecto; las tablas usan nombres completos
+      serverless: true
+      continuous: true              # latencia de minutos para monitoreo operativo
+      channel: CURRENT
+      libraries:
+        - file: { path: ./01_bronze.py }
+        - file: { path: ./02_silver.py }
+        - file: { path: ./03_gold.sql }
+      configuration:
+        adq.eventhubs_namespace: ${var.eventhubs_namespace}
+      notifications:
+        - email_recipients: [ "equipo-datos-adquirencia@banco.com" ]
+          alerts: [ on-update-failure, on-update-fatal-failure, on-flow-failure ]
+
+  jobs:
+    adq_gobierno:
+      name: adq-gobierno-y-seguridad
+      tasks:
+        - task_key: aplicar_gobierno
+          sql_task:
+            file: { path: ./04_gobierno_seguridad.sql }
+            warehouse_id: ${var.warehouse_id}
+
+targets:
+  dev:
+    mode: development
+    default: true
+  prod:
+    mode: production

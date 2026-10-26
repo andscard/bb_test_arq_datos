@@ -1,0 +1,6 @@
+fastapi>=0.115
+pydantic>=2.7
+databricks-sql-connector>=3.4
+httpx>=0.27
+uvicorn>=0.30
+pytest>=8.0

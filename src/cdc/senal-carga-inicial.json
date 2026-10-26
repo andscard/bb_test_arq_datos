@@ -1,0 +1,15 @@
+{
+  "_comentario": "Mensaje que se publica en el event hub 'adq-cdc-signals' para iniciar la carga inicial (incremental snapshot). La clave del mensaje debe ser el topic.prefix del conector: 'adq'. Borrar este campo antes de enviarlo.",
+  "type": "execute-snapshot",
+  "data": {
+    "type": "INCREMENTAL",
+    "data-collections": [
+      "adquirencia.bco_t_canal_digital",
+      "adquirencia.bco_t_sucursal_geo",
+      "adquirencia.bco_t_comercio_360",
+      "adquirencia.bco_t_trx_maestra",
+      "adquirencia.bco_t_trx_detalle",
+      "adquirencia.bco_t_estado_workflow"
+    ]
+  }
+}

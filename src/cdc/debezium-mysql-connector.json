@@ -1,0 +1,53 @@
+{
+    "name": "adq-mysql-cdc",
+    "config": {
+        "connector.class": "io.debezium.connector.mysql.MySqlConnector",
+        "tasks.max": "1",
+
+        "database.hostname": "${file:/opt/secrets/mysql.properties:replica_host}",
+        "database.port": "3306",
+        "database.user": "svc_debezium",
+        "database.password": "${file:/opt/secrets/mysql.properties:password}",
+        "database.server.id": "184054",
+        "database.ssl.mode": "required",
+
+        "topic.prefix": "adq",
+        "database.include.list": "adquirencia",
+        "table.include.list": "adquirencia.bco_t_trx_maestra,adquirencia.bco_t_trx_detalle,adquirencia.bco_t_comercio_360,adquirencia.bco_t_canal_digital,adquirencia.bco_t_sucursal_geo,adquirencia.bco_t_estado_workflow",
+
+        "column.exclude.list": "adquirencia.bco_t_trx_maestra.pan,adquirencia.bco_t_trx_maestra.track_data,adquirencia.bco_t_trx_maestra.cvv_resultado",
+
+        "snapshot.mode": "no_data",
+        "read.only": "true",
+        "incremental.snapshot.chunk.size": "10000",
+        "signal.enabled.channels": "kafka",
+        "signal.kafka.topic": "adq-cdc-signals",
+        "signal.kafka.bootstrap.servers": "${file:/opt/secrets/eventhubs.properties:bootstrap}",
+        "signal.consumer.security.protocol": "SASL_SSL",
+        "signal.consumer.sasl.mechanism": "PLAIN",
+        "signal.consumer.sasl.jaas.config": "${file:/opt/secrets/eventhubs.properties:jaas}",
+
+        "decimal.handling.mode": "string",
+        "time.precision.mode": "connect",
+        "include.schema.changes": "false",
+        "tombstones.on.delete": "false",
+
+        "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "key.converter.schemas.enable": "false",
+        "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "value.converter.schemas.enable": "false",
+
+        "schema.history.internal.kafka.topic": "adq-schema-history",
+        "schema.history.internal.kafka.bootstrap.servers": "${file:/opt/secrets/eventhubs.properties:bootstrap}",
+        "schema.history.internal.producer.security.protocol": "SASL_SSL",
+        "schema.history.internal.producer.sasl.mechanism": "PLAIN",
+        "schema.history.internal.producer.sasl.jaas.config": "${file:/opt/secrets/eventhubs.properties:jaas}",
+        "schema.history.internal.consumer.security.protocol": "SASL_SSL",
+        "schema.history.internal.consumer.sasl.mechanism": "PLAIN",
+        "schema.history.internal.consumer.sasl.jaas.config": "${file:/opt/secrets/eventhubs.properties:jaas}",
+
+        "heartbeat.interval.ms": "10000",
+        "errors.max.retries": "-1",
+        "errors.retry.delay.max.ms": "60000"
+    }
+}
